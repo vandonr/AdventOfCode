@@ -8,8 +8,35 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day2Part2(Input.Day2));
+            Console.WriteLine(Day3(Input.Day3));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day3(string[] numbers)
+        {
+            var majority = numbers.Length/2;
+            var countOfOnes = new int[12]; //numbers are 12 bits long
+            foreach(var n in numbers)
+            {
+                for (int i = 0; i < n.Length; i++)
+                {
+                    if (n[i] == '1') countOfOnes[i]++;
+                }
+            }
+            // gamma rate is most common bit
+            // esplion is the opposite
+            var gamma = 0;
+            var epsilon = 0;
+            foreach(var c in countOfOnes)
+            {
+                gamma = gamma << 1;
+                epsilon = epsilon << 1;
+                if (c > majority)
+                    gamma++;
+                else
+                    epsilon++;
+            }
+            return gamma * epsilon;
         }
 
         static int Day2Part2(string[] instructions)
