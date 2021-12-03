@@ -16,7 +16,7 @@ namespace AdventOfCode
         static int Day3Part2(string[] numbers)
         {
             numbers = numbers.OrderByDescending(s => s).ToArray();
-            
+
             var oxy = Convert.ToInt32(DigFor(numbers, Vitals.Oxygen), 2);
             var co2 = Convert.ToInt32(DigFor(numbers, Vitals.CO2), 2);
 
@@ -32,46 +32,44 @@ namespace AdventOfCode
             for (var step = 0; step < 12; step++)
             {
                 // most common digit is the one in the middle
-                var middleIndex = lower + (upper - lower) / 2;
-                var mostCommonDigit = numbers[middleIndex][step];
+                var mostCommonDigit = numbers[Middle(lower, upper)][step];
+                var last1 = BinarySearchForBoundary(numbers, lower, upper, step);
                 if (mostCommonDigit == '1')
                 {
-                    //go down
-                    for (int i = middleIndex + 1; i <= upper; i++)
-                    {
-                        if (numbers[i][step] == '0')
-                        {
-                            if (check == Vitals.Oxygen)
-                                upper = i - 1;
-                            else
-                                lower = i;
-                            break;
-                        }
-                    }
+                    if (check == Vitals.Oxygen)
+                        upper = last1;
+                    else
+                        lower = last1 + 1;
                 }
                 else
                 {
-                    //go up
-                    for (int i = middleIndex - 1; i > lower; i--)
-                    {
-                        if (numbers[i][step] == '1')
-                        {
-                            if (check == Vitals.Oxygen)
-                                lower = i + 1;
-                            else
-                                upper = i;
-                            break;
-                        }
-
-                    }
+                    if (check == Vitals.Oxygen)
+                        lower = last1 + 1;
+                    else
+                        upper = last1;
                 }
                 if (lower == upper)
-                {
                     return numbers[lower];
-                }
             }
             throw new Exception("does not converge to a single value");
         }
+
+        /// <summary> Returns the index of the last '1' in the specified range </summary>
+        private static int BinarySearchForBoundary(string[] a, int low, int high, int step)
+        {
+            while (high - low > 1)
+            {
+                // look in the middle
+                var mid = Middle(low, high);
+                if (a[mid][step] == '1') // if 1 then border is south
+                    low = mid;
+                else // else it's north
+                    high = mid;
+            }
+            return low;
+        }
+
+        private static int Middle(int low, int high) { Debug.Assert(low < high); return low + (high - low) / 2; }
 
         static int Day3(string[] numbers)
         {
@@ -90,8 +88,8 @@ namespace AdventOfCode
             var epsilon = 0;
             foreach(var c in countOfOnes)
             {
-                gamma = gamma << 1;
-                epsilon = epsilon << 1;
+                gamma <<= 1;
+                epsilon <<= 1;
                 if (c > majority)
                     gamma++;
                 else
