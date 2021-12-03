@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace AdventOfCode
 {
@@ -8,8 +9,68 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day3(Input.Day3));
+            Console.WriteLine(Day3Part2(Input.Day3));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day3Part2(string[] numbers)
+        {
+            numbers = numbers.OrderByDescending(s => s).ToArray();
+            
+            var oxy = Convert.ToInt32(DigFor(numbers, Vitals.Oxygen), 2);
+            var co2 = Convert.ToInt32(DigFor(numbers, Vitals.CO2), 2);
+
+            return oxy * co2;
+        }
+
+        enum Vitals { Oxygen, CO2 }
+        private static string DigFor(string[] numbers, Vitals check)
+        {
+            var lower = 0;
+            var upper = numbers.Length - 1;
+
+            for (var step = 0; step < 12; step++)
+            {
+                // most common digit is the one in the middle
+                var middleIndex = lower + (upper - lower) / 2;
+                var mostCommonDigit = numbers[middleIndex][step];
+                if (mostCommonDigit == '1')
+                {
+                    //go down
+                    for (int i = middleIndex + 1; i <= upper; i++)
+                    {
+                        if (numbers[i][step] == '0')
+                        {
+                            if (check == Vitals.Oxygen)
+                                upper = i - 1;
+                            else
+                                lower = i;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //go up
+                    for (int i = middleIndex - 1; i > lower; i--)
+                    {
+                        if (numbers[i][step] == '1')
+                        {
+                            if (check == Vitals.Oxygen)
+                                lower = i + 1;
+                            else
+                                upper = i;
+                            break;
+                        }
+
+                    }
+                }
+                if (lower == upper)
+                {
+                    return numbers[lower];
+                }
+            }
+            throw new Exception("does not converge to a single value");
         }
 
         static int Day3(string[] numbers)
