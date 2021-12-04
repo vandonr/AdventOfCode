@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -9,8 +10,71 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day3Part2(Input.Day3));
+            Console.WriteLine(Day4(Input.Day4Numbers, Input.Day4));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        class GridCompletion
+        {
+            public int[] rows = new int[5];
+            public int[] columns = new int[5];
+        }
+
+        static int Day4(int[] numbers, List<int[][]> grids)
+        {
+            // create a map of when a number is drawn
+            var drawOrder = new Dictionary<int, int>();
+            for (int i = 0; i < numbers.Length; i++)
+                drawOrder[numbers[i]] = i;
+
+            var earliestComp = Int32.MaxValue;
+            var earliestIndex = -1;
+            var latestComp = 0;
+            var latesIndex = -1;
+            for (int i = 0; i < grids.Count; i++)
+            {
+                var comp = new GridCompletion();
+                for (int x = 0; x < 5; x++)
+                {
+                    for (int y = 0; y < 5; y++)
+                    {
+                        var number = grids[i][x][y];
+                        var drawn = drawOrder[number];
+                        comp.rows[x] = Math.Max(comp.rows[x], drawn);
+                        comp.columns[y] = Math.Max(comp.columns[y], drawn);
+                    }
+                }
+                var completionRound = comp.rows.Concat(comp.columns).Min();
+                //part 1
+                if (completionRound < earliestComp)
+                {
+                    earliestComp = completionRound;
+                    earliestIndex = i;
+                }
+                //part 2
+                if (completionRound > latestComp)
+                {
+                    latestComp = completionRound;
+                    latesIndex = i;
+                }
+            }
+
+            //part 1
+            ComputeGridScore(grids[earliestIndex], numbers, earliestComp);
+            //part 2
+            return ComputeGridScore(grids[latesIndex], numbers, latestComp);
+        }
+
+        private static int ComputeGridScore(int[][] grid, int[] numbers, int until)
+        {
+            var flattenedGrid = grid.SelectMany(n => n).ToHashSet();
+            for (int i = 0; i <= until; i++)
+            {
+                var drawn = numbers[i];
+                if (flattenedGrid.Contains(drawn))
+                    flattenedGrid.Remove(drawn);
+            }
+            return flattenedGrid.Sum() * numbers[until];
         }
 
         static int Day3Part2(string[] numbers)
