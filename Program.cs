@@ -10,7 +10,7 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day4(Input.Day4Numbers, Input.Day4));
+            Console.WriteLine(Day4(Input.Day4Numbers, Input.Day4).part2);
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
         }
 
@@ -20,7 +20,7 @@ namespace AdventOfCode
             public int[] columns = new int[5];
         }
 
-        static int Day4(int[] numbers, List<int[][]> grids)
+        static (int part1, int part2) Day4(int[] numbers, List<int[][]> grids)
         {
             // create a map of when a number is drawn
             var drawOrder = new Dictionary<int, int>();
@@ -59,10 +59,8 @@ namespace AdventOfCode
                 }
             }
 
-            //part 1
-            ComputeGridScore(grids[earliestIndex], numbers, earliestComp);
-            //part 2
-            return ComputeGridScore(grids[latesIndex], numbers, latestComp);
+            return (part1: ComputeGridScore(grids[earliestIndex], numbers, earliestComp),
+                part2: ComputeGridScore(grids[latesIndex], numbers, latestComp));
         }
 
         private static int ComputeGridScore(int[][] grid, int[] numbers, int until)
