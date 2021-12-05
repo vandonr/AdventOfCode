@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 
 namespace AdventOfCode
@@ -10,8 +11,27 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day4(Input.Day4Numbers, Input.Day4).part2);
+            Console.WriteLine(Day5(Input.Day5));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day5(List<Tuple<Point, Point>> segments)
+        {
+            var occupation = new byte[1000, 1000];
+            foreach (var s in segments)
+            {
+                if(s.Item1.X == s.Item2.X)
+                {
+                    for (int y = Math.Min(s.Item1.Y, s.Item2.Y); y <= Math.Max(s.Item1.Y, s.Item2.Y); y++)
+                        occupation[s.Item1.X, y]++;
+                }
+                else if (s.Item1.Y == s.Item2.Y)
+                {
+                    for (int x = Math.Min(s.Item1.X, s.Item2.X); x <= Math.Max(s.Item1.X, s.Item2.X); x++)
+                        occupation[x, s.Item1.Y]++;
+                }
+            }
+            return (from byte c in occupation select c >= 2).Count(c => c);
         }
 
         class GridCompletion
