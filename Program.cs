@@ -30,6 +30,28 @@ namespace AdventOfCode
                     for (int x = Math.Min(s.Item1.X, s.Item2.X); x <= Math.Max(s.Item1.X, s.Item2.X); x++)
                         occupation[x, s.Item1.Y]++;
                 }
+                #region part2
+                else //diagonals
+                {
+                    int starty;
+                    int incry;
+                    if ((s.Item1.X < s.Item2.X && s.Item1.Y < s.Item2.Y) || (s.Item1.X > s.Item2.X && s.Item1.Y > s.Item2.Y)) // if x and y go in the same direction
+                    {
+                        starty = Math.Min(s.Item1.Y, s.Item2.Y);
+                        incry = 1;
+                    }
+                    else
+                    {
+                        starty = Math.Max(s.Item1.Y, s.Item2.Y);
+                        incry = -1;
+                    }
+
+                    for (int x = Math.Min(s.Item1.X, s.Item2.X), y = starty;
+                        x <= Math.Max(s.Item1.X, s.Item2.X);
+                        x++, y+=incry)
+                        occupation[x, y]++;
+                }
+                #endregion
             }
             return (from byte c in occupation select c >= 2).Count(c => c);
         }
