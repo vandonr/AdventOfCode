@@ -3010,7 +3010,7 @@ down 2
 forward 5
 up 6
 down 7
-forward 2".Split("\r\n");
+forward 2".Split(Environment.NewLine);
 
         public static readonly string[] Day3 =
         {
@@ -4616,7 +4616,7 @@ forward 2".Split("\r\n");
 82 57 32 40 20
 72 21 74 46 43
 41 15 98  2 11
- 5 96 22 18 55".Split("\r\n\r\n").Select(s => s.Split("\r\n").Select(l => l.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(n => Int32.Parse(n)).ToArray()).ToArray()).ToList();
+ 5 96 22 18 55".Split(Environment.NewLine + Environment.NewLine).Select(s => s.Split(Environment.NewLine).Select(l => l.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(n => Int32.Parse(n)).ToArray()).ToArray()).ToList();
 
         public static readonly List<Tuple<Point, Point>> Day5 = @"419,207 -> 419,109
 300,888 -> 803,385
@@ -5117,7 +5117,7 @@ forward 2".Split("\r\n");
 466,982 -> 807,982
 320,143 -> 692,515
 477,649 -> 477,206
-456,254 -> 456,578".Split("\r\n").Select(l =>
+456,254 -> 456,578".Split(Environment.NewLine).Select(l =>
                                              {
                                                  var seg = l.Split(" -> ").Select(s =>
                                                  {
