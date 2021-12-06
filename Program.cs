@@ -11,31 +11,33 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day6(Input.Day6, 80));
+            Console.WriteLine(Day6(Input.Day6, 256));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
         }
 
         static long Day6(int[] fish, int days)
         {
             //precompute how many fishes one fish becomes in specified nb of days depending on its age at d0
-            var numberAfterManyDays = new int[6];
-            var simulated = new List<byte> { 5 };
+            var numberAfterManyDays = new long[6];
+
+            var simulation = new long[9];
+            simulation[5] = 1; //seed it with 1 fish at counter 5
+            var simulationtmp = new long[9];
             for (int t = 1; t < days+5; t++)
             {
-                int count = simulated.Count;
-                for (int i = 0; i < count; i++)
+                for (int i = 1; i < 9; i++)
                 {
-                    if (simulated[i] == 0)
-                    {
-                        simulated.Add(8);
-                        simulated[i] = 6;
-                    }
-                    else
-                        simulated[i]--;
+                    simulationtmp[i - 1] = simulation[i]; //aging
                 }
+                simulationtmp[8] = simulation[0]; //spawning
+                simulationtmp[6] += simulation[0]; //reset age
+                //swap pointers
+                var tmp = simulation;
+                simulation = simulationtmp;
+                simulationtmp = tmp;
 
                 if (t >= days)
-                    numberAfterManyDays[days + 5 - t] = simulated.Count;
+                    numberAfterManyDays[days + 5 - t] = simulation.Sum();
             }
 
             long tot = 0;
