@@ -11,8 +11,39 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day5(Input.Day5));
+            Console.WriteLine(Day6(Input.Day6, 80));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static long Day6(int[] fish, int days)
+        {
+            //precompute how many fishes one fish becomes in specified nb of days depending on its age at d0
+            var numberAfterManyDays = new int[6];
+            var simulated = new List<byte> { 5 };
+            for (int t = 1; t < days+5; t++)
+            {
+                int count = simulated.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    if (simulated[i] == 0)
+                    {
+                        simulated.Add(8);
+                        simulated[i] = 6;
+                    }
+                    else
+                        simulated[i]--;
+                }
+
+                if (t >= days)
+                    numberAfterManyDays[days + 5 - t] = simulated.Count;
+            }
+
+            long tot = 0;
+            foreach (var f in fish)
+            {
+                tot += numberAfterManyDays[f];
+            }
+            return tot;
         }
 
         static int Day5(List<Tuple<Point, Point>> segments)
