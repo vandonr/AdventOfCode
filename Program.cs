@@ -11,8 +11,15 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day6(Input.Day6, 256));
+            Console.WriteLine(Day7(Input.Day7));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day7(int[] positions)
+        {
+            Array.Sort(positions);
+            int median = positions[positions.Length / 2];
+            return positions.Sum(p => Math.Abs(p-median));
         }
 
         static long Day6(int[] fish, int days)
