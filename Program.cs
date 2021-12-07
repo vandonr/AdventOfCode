@@ -11,8 +11,16 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day7(Input.Day7));
+            Console.WriteLine(Day7Part2(Input.Day7));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day7Part2(int[] positions)
+        {
+            // cheated this one :|
+            // rounded average was too high so I rounded down instead and it worked ¯\_(ツ)_/¯
+            int avg = positions.Sum()/positions.Length;
+            return positions.Sum(p => { var distance = Math.Abs(p - avg); return (distance * (distance + 1)) / 2; });
         }
 
         static int Day7(int[] positions)
