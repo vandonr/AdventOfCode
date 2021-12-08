@@ -11,8 +11,85 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day7Part2(Input.Day7));
+            Console.WriteLine(Day8Part2(Input.Day8Patterns, Input.Day8Digits));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
+        }
+
+        static int Day8Part2(string[][] patterns, string[][] digits)
+        {
+            int sum = 0;
+            for (int i = 0; i < patterns.Length; i++)
+            {
+                var patternByLength = patterns[i].ToLookup(p => p.Length, p => p).ToDictionary(kv => kv.Key, kv => kv.ToList());
+
+                // 2 segments means 1
+                // 3 segments means 7 and 7 - 1 = segment on top => doesn't help because it's always on
+                // 4 segments mens 4 and 4 - 1 = 2 segments
+                var one = patternByLength[2][0];
+                var seven = patternByLength[3][0];
+                var four = patternByLength[4][0];
+                var eight = patternByLength[7][0];
+
+                // 5 segments -> 2, 3, 5
+                // 6 segments -> 0, 6, 9
+                var _235 = patternByLength[5];
+                var _069 = patternByLength[6];
+
+                // if 6 segments & has both detected in 4-1, then it's 6 or 9, else it's 0
+                // if it has both detected in 1 it's 9 else it's 6
+                string zero = null, six = null, nine = null;
+                foreach (var digit in _069)
+                {
+                    if (digit.Intersect(four.Except(one)).Count() == 1)
+                        zero = digit;
+                    else if (digit.Intersect(one).Count() == 2)
+                        nine = digit;
+                    else
+                        six = digit;
+                }
+
+                // 3 is the only one with both right segments on
+                // we can discriminate 2 and 5 by comparing to 4
+                string two = null, three = null, five = null;
+                foreach (var digit in _235)
+                {
+                    if (digit.Intersect(one).Count() == 2)
+                        three = digit;
+                    else if (digit.Except(four).Count() == 2)
+                        five = digit;
+                    else
+                        two = digit;
+                }
+
+                // building a whole dictionary just for 4 lookups ? Yessir.
+                var translation = new Dictionary<string, int>
+                {
+                    {new String(zero.OrderBy(c => c).ToArray()), 0 },
+                    {new String(one.OrderBy(c => c).ToArray()), 1 },
+                    {new String(two.OrderBy(c => c).ToArray()), 2 },
+                    {new String(three.OrderBy(c => c).ToArray()), 3 },
+                    {new String(four.OrderBy(c => c).ToArray()), 4 },
+                    {new String(five.OrderBy(c => c).ToArray()), 5 },
+                    {new String(six.OrderBy(c => c).ToArray()), 6 },
+                    {new String(seven.OrderBy(c => c).ToArray()), 7 },
+                    {new String(eight.OrderBy(c => c).ToArray()), 8 },
+                    {new String(nine.OrderBy(c => c).ToArray()), 9 },
+                };
+
+                int number = 0;
+                foreach (var d in digits[i])
+                {
+                    number *= 10;
+                    number += translation[new String(d.OrderBy(c => c).ToArray())];
+                }
+                sum += number;
+            }
+            return sum;
+        }
+
+        static int Day8(string[][] digits)
+        {
+            return digits.SelectMany(d => d).Count(d => d.Length != 5 && d.Length != 6);
         }
 
         static int Day7Part2(int[] positions)
@@ -27,7 +104,7 @@ namespace AdventOfCode
         {
             Array.Sort(positions);
             int median = positions[positions.Length / 2];
-            return positions.Sum(p => Math.Abs(p-median));
+            return positions.Sum(p => Math.Abs(p - median));
         }
 
         static long Day6(int[] fish, int days)
