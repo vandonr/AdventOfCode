@@ -16,6 +16,6 @@ namespace AdventOfCode
             return 0;
         }
 
-        public static readonly string Input = "";
+        public static readonly string Input = @"";
     }
 }
