@@ -21,7 +21,6 @@ namespace AdventOfCode
                     for (int j = 0; j < 10; j++)
                         if (octopuses[i][j] > '9')
                             flashes += Flash(octopuses, i, j);
-                Console.WriteLine(step);
                 step++;
             }
             return step;
