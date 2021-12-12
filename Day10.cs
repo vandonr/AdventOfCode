@@ -6,48 +6,6 @@ namespace AdventOfCode
 {
     class Day10
     {
-        public static long Part2(string[] lines)
-        {
-            var points = new Dictionary<char, int>
-            {
-                {'(', 1},
-                {'[', 2},
-                {'{', 3},
-                {'<', 4},
-            };
-            var scores = new List<long>();
-            foreach (var l in lines)
-            {
-                var open = new Stack<char>();
-                foreach (var c in l)
-                {
-                    char opening;
-                    if (matching.TryGetValue(c, out opening))
-                    {
-                        char actual;
-                        if (!open.TryPop(out actual) || actual != opening)
-                        {
-                            open.Clear();
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        open.Push(c);
-                    }
-                }
-
-                long score = 0;
-                char o;
-                while(open.TryPop(out o))
-                    score = score * 5 + points[o];
-                if(score != 0)
-                    scores.Add(score);
-            }
-            scores.Sort();
-            return scores[scores.Count/2];
-        }
-
         private static Dictionary<char, char> matching = new Dictionary<char, char>
         {
             {')', '(' },
@@ -56,16 +14,26 @@ namespace AdventOfCode
             {'>', '<' },
         };
 
-        public static int Part1(string[] lines)
+        public static (int, long) Solve(string[] lines)
         {
-            var scores = new Dictionary<char, int>
+            var noMatchPoints = new Dictionary<char, int>
             {
                 {')', 3},
                 {']', 57},
                 {'}', 1197},
                 {'>', 25137},
             };
-            int score = 0;
+            var matchPoints = new Dictionary<char, int>
+            {
+                {'(', 1},
+                {'[', 2},
+                {'{', 3},
+                {'<', 4},
+            };
+
+            int noMatchScore = 0;
+            var matchScores = new List<long>();
+
             foreach (var l in lines)
             {
                 var open = new Stack<char>();
@@ -77,7 +45,8 @@ namespace AdventOfCode
                         char actual;
                         if (!open.TryPop(out actual) || actual != opening)
                         {
-                            score += scores[c];
+                            noMatchScore += noMatchPoints[c]; //part1
+                            open = null;
                             break;
                         }
                     }
@@ -86,8 +55,19 @@ namespace AdventOfCode
                         open.Push(c);
                     }
                 }
+
+                if (open != null) //part 2
+                {
+                    long score = 0;
+                    char o;
+                    while (open.TryPop(out o))
+                        score = score * 5 + matchPoints[o];
+                    matchScores.Add(score);
+                }
+
             }
-            return score;
+            matchScores.Sort();
+            return (noMatchScore, matchScores[matchScores.Count / 2]);
         }
 
         public static readonly string[] Input = @"{[[<{(<{[{{[{[[]{}]{<>{}}}({<>()}{{}{}})]}{({[<>{}]({}[])})[{[{}[]](()<>)}<[{}{}]{()<>}>]}}]<(({{{(){}}{[][]
