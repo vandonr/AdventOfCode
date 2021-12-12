@@ -12,15 +12,7 @@ namespace AdventOfCode
             int step = 0;
             while(flashes < 100)
             {
-                flashes = 0;
-                for (int i = 0; i < 10; i++)
-                    for (int j = 0; j < 10; j++)
-                        octopuses[i][j]++;
-
-                for (int i = 0; i < 10; i++)
-                    for (int j = 0; j < 10; j++)
-                        if (octopuses[i][j] > '9')
-                            flashes += Flash(octopuses, i, j);
+                flashes = Step(octopuses);
                 step++;
             }
             return step;
@@ -37,15 +29,23 @@ namespace AdventOfCode
             int flashes = 0;
             for(int step = 0; step < 100; step++)
             {
-                for (int i = 0; i < 10; i++)
-                    for (int j = 0; j < 10; j++)
-                        octopuses[i][j]++;
-
-                for (int i = 0; i < 10; i++)
-                    for (int j = 0; j < 10; j++)
-                        if (octopuses[i][j] > '9')
-                            flashes += Flash(octopuses, i, j);
+                flashes += Step(octopuses);
             }
+            return flashes;
+        }
+
+        private static int Step(char[][] octopuses)
+        {
+            int flashes = 0;
+            for (int i = 0; i < 10; i++)
+                for (int j = 0; j < 10; j++)
+                    octopuses[i][j]++;
+
+            for (int i = 0; i < 10; i++)
+                for (int j = 0; j < 10; j++)
+                    if (octopuses[i][j] > '9')
+                        flashes += Flash(octopuses, i, j);
+
             return flashes;
         }
 
