@@ -7,22 +7,46 @@ namespace AdventOfCode
 {
     class Day14
     {
-        public static int Part2(string polymer, Dictionary<string, string> pairs)
+        public static long Part2(string polymer, Dictionary<string, string> pairs)
         {
-            polymer = "SN";
-            for (int step = 0; step < 40; step++)
+            var lookup = new Dictionary<string, long[][]>();
+            foreach (var pair in pairs)
             {
-                var sb = new StringBuilder();
-                for (int i = 0; i < polymer.Length - 1; i++)
-                {
-                    sb.Append(polymer[i]);
-                    sb.Append(pairs[polymer.Substring(i, 2)]);
-                }
-                sb.Append(polymer[polymer.Length - 1]);
-                polymer = sb.ToString();
-                Console.WriteLine(step + " - " + polymer.Length);
+                var steps = new long[40][];
+                steps[0] = new long[255];
+                steps[0][pair.Value[0]] = 1;
+                lookup[pair.Key] = steps;
             }
-            return polymer.Length;
+
+            for (int step = 1; step < 40; step++)
+            {
+                foreach (var l in lookup)
+                {
+                    var left = l.Key[0] + pairs[l.Key];
+                    var right = pairs[l.Key] + l.Key[1];
+                    l.Value[step] = Add(Add(l.Value[0], lookup[left][step - 1]), lookup[right][step - 1]);
+                }
+            }
+
+            var result = new long[255];
+            for (int i = 0; i < polymer.Length - 1; i++)
+            {
+                var key = polymer.Substring(i, 2);
+                result = Add(result, lookup[key][39]);
+                result[polymer[i]]++;
+            }
+            result[polymer[polymer.Length - 1]]++;
+
+            var filtered = result.Where(c => c > 0);
+            return filtered.Max() - filtered.Min();
+        }
+
+        private static long[] Add(long[] a, long[] b)
+        {
+            var res = new long[a.Length];
+            for (int i = 0; i < a.Length; i++)
+                res[i] = a[i] + b[i];
+            return res;
         }
 
         public static int Part1(string polymer, Dictionary<string, string> pairs)
