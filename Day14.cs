@@ -7,35 +7,43 @@ namespace AdventOfCode
 {
     class Day14
     {
-        public static long Part2(string polymer, Dictionary<string, string> pairs)
+        public static long Part2(string polymer, Dictionary<string, char> pairs)
         {
-            var lookup = new Dictionary<string, long[][]>();
+            // init with just the middle letter
+            var lookup = new Dictionary<string, long[]>();
             foreach (var pair in pairs)
             {
-                var steps = new long[40][];
-                steps[0] = new long[255];
-                steps[0][pair.Value[0]] = 1;
-                lookup[pair.Key] = steps;
+                var step = new long[26];
+                step[pair.Value - 'A'] = 1;
+                lookup[pair.Key] = step;
             }
 
+            // then run the steps
+            // where step[n] = step[n-1] of left and right, plus the middle letter
             for (int step = 1; step < 40; step++)
             {
-                foreach (var l in lookup)
+                var prev = lookup;
+                lookup = new Dictionary<string, long[]>();
+                foreach (var l in prev)
                 {
-                    var left = l.Key[0] + pairs[l.Key];
-                    var right = pairs[l.Key] + l.Key[1];
-                    l.Value[step] = Add(Add(l.Value[0], lookup[left][step - 1]), lookup[right][step - 1]);
+                    var left = new String(new[] { l.Key[0], pairs[l.Key] });
+                    var right = new String(new[] { pairs[l.Key], l.Key[1] });
+                    var newState = Add(prev[left], prev[right]);
+                    newState[pairs[l.Key] - 'A']++;
+                    lookup.Add(l.Key, newState);
                 }
             }
 
-            var result = new long[255];
+            // now use the lookup table to get the resulting state for each pair
+            var result = new long[26];
             for (int i = 0; i < polymer.Length - 1; i++)
             {
                 var key = polymer.Substring(i, 2);
-                result = Add(result, lookup[key][39]);
-                result[polymer[i]]++;
+                result = Add(result, lookup[key]);
+                result[polymer[i] - 'A']++;
             }
-            result[polymer[polymer.Length - 1]]++;
+            // add last letter
+            result[polymer[polymer.Length - 1] - 'A']++;
 
             var filtered = result.Where(c => c > 0);
             return filtered.Max() - filtered.Min();
@@ -49,7 +57,7 @@ namespace AdventOfCode
             return res;
         }
 
-        public static int Part1(string polymer, Dictionary<string, string> pairs)
+        public static int Part1(string polymer, Dictionary<string, char> pairs)
         {
             for (int step = 0; step < 10; step++)
             {
@@ -69,7 +77,7 @@ namespace AdventOfCode
         }
 
         public static readonly string StartingForm = "SNVVKOBFKOPBFFFCPBSF";
-        public static readonly Dictionary<string, string> Input = @"HH -> P
+        public static readonly Dictionary<string, char> Input = @"HH -> P
 CH -> P
 HK -> N
 OS -> N
@@ -168,6 +176,6 @@ VV -> N
 BP -> P
 KN -> C
 NK -> O
-KB -> F".Split(Environment.NewLine).Select(l => l.Split(" -> ")).ToDictionary(a => a[0], a => a[1]);
+KB -> F".Split(Environment.NewLine).Select(l => l.Split(" -> ")).ToDictionary(a => a[0], a => a[1][0]);
     }
 }
