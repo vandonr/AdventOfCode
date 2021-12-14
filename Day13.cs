@@ -43,10 +43,10 @@ namespace AdventOfCode
             return sb.ToString();
         }
 
-        public static int Part1(Point[] dots, string[] folding)
+        public static int Part1(Point[] dots, string folding)
         {
-            var folded = Fold(dots, 655, "x");
-
+            var sp = folding.Split('=');
+            var folded = Fold(dots, Int32.Parse(sp[1]), sp[0]);
             return folded.Count;
         }
 
