@@ -7,18 +7,72 @@ namespace AdventOfCode
 {
     static class Day16
     {
-        public static int Part2()
-        {
-            return 0;
-        }
-
-        public static int Part1(BitArray input)
+        public static long Part2(BitArray input)
         {
             int i = 0;
             return input.ReadPacket(ref i);
         }
 
-        private static int ReadPacket(this BitArray input, ref int i)
+        private static long ReadPacket(this BitArray input, ref int i)
+        {
+            var version = input.Read(ref i, 3);
+            var type = input.Read(ref i, 3);
+            if (type == 4)
+            {
+                long number = 0;
+                //skip over value
+                while (input[i++])
+                    number = (number << 4) + input.Read(ref i, 4);
+                number = (number << 4) + input.Read(ref i, 4);
+                return number;
+            }
+            else
+            {
+                var values = new List<long>();
+                if (input[i++])
+                {
+                    for (var nbSub = input.Read(ref i, 11); nbSub > 0; nbSub--)
+                        values.Add(input.ReadPacket(ref i));
+                }
+                else
+                {
+                    var lenSub = input.Read(ref i, 15);
+                    var endSub = i + lenSub;
+                    while (i < endSub)
+                        values.Add(input.ReadPacket(ref i));
+                }
+
+                switch (type)
+                {
+                    case 0: //0 = sum
+                        return values.Sum();
+                    case 1: //1 = product
+                        long val = 1;
+                        foreach (var item in values)
+                            val *= item;
+                        return val;
+                    case 2: //2 = min
+                        return values.Min();
+                    case 3: //3 = max
+                        return values.Max();
+                    case 5: //5 = gt
+                        return values[0] > values[1] ? 1 : 0;
+                    case 6: //6 = lt
+                        return values[0] < values[1] ? 1 : 0;
+                    case 7: //7 = equal
+                        return values[0] == values[1] ? 1 : 0;
+                }
+            }
+            return version;
+        }
+
+        public static int Part1(BitArray input)
+        {
+            int i = 0;
+            return input.ReadPacketVersion(ref i);
+        }
+
+        private static int ReadPacketVersion(this BitArray input, ref int i)
         {
             var version = input.Read(ref i, 3);
             var type = input.Read(ref i, 3);
@@ -34,14 +88,14 @@ namespace AdventOfCode
                 if (input[i++])
                 {
                     for (var nbSub = input.Read(ref i, 11); nbSub > 0; nbSub--)
-                        version += input.ReadPacket(ref i);
+                        version += input.ReadPacketVersion(ref i);
                 }
                 else
                 {
                     var lenSub = input.Read(ref i, 15);
                     var endSub = i + lenSub;
                     while (i < endSub)
-                        version += input.ReadPacket(ref i);
+                        version += input.ReadPacketVersion(ref i);
                 }
             }
             return version;
