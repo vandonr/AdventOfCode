@@ -26,8 +26,7 @@ namespace AdventOfCode
                 CreateLinks(leaves);
 
                 //reduce
-                while (Explode(current) || Split(current))
-                    Console.WriteLine(current);
+                while (Explode(current) || Split(current)) ;
             }
 
             return current.Magnitude();
@@ -78,10 +77,12 @@ namespace AdventOfCode
                 p.LeftC = new Pair(p.Value / 2);
                 p.RightC = new Pair((p.Value / 2) + (p.Value % 2));
                 p.LeftC.LeftNeigh = p.LeftNeigh;
+                p.LeftC.RightNeigh = p.RightC;
                 if(p.LeftNeigh != null)
                     p.LeftNeigh.RightNeigh = p.LeftC;
                 p.RightC.RightNeigh = p.RightNeigh;
-                if(p.RightNeigh != null)
+                p.RightC.LeftNeigh = p.LeftC;
+                if (p.RightNeigh != null)
                     p.RightNeigh.LeftNeigh = p.RightC;
 
                 p.Value = -1;
