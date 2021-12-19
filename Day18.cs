@@ -5,12 +5,33 @@ namespace AdventOfCode
 {
     public class Day18
     {
-        public static int Part2()
+        public static int Part2(string[] snailfishNb)
         {
-            return 0;
+            var max = 0;
+            for (int i = 0; i < snailfishNb.Length; i++)
+            {
+                for (int j = 0; j < snailfishNb.Length; j++)
+                {
+                    if (i == j)
+                        continue;
+
+                    var leaves = new List<Pair>();
+                    var a = Parse(snailfishNb[i], leaves);
+                    var b = Parse(snailfishNb[j], leaves);
+                    CreateLinks(leaves);
+
+                    var current = new Pair(a, b);
+                    while (Explode(current) || Split(current)) ;
+
+                    var mag = current.Magnitude();
+                    if (mag > max)
+                        max = mag;
+                }
+            }
+            return max;
         }
 
-        public static long Part1(string[] snailfishNb)
+        public static int Part1(string[] snailfishNb)
         {
             var leaves = new List<Pair>();
             var current = Parse(snailfishNb[0], leaves);
@@ -120,7 +141,7 @@ namespace AdventOfCode
                 return $"[{LeftC},{RightC}]";
             }
 
-            public long Magnitude()
+            public int Magnitude()
             {
                 if (Value >= 0) return Value;
                 return 3*LeftC.Magnitude() + 2*RightC.Magnitude();
