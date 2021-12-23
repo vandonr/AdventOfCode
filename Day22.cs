@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -7,9 +8,31 @@ namespace AdventOfCode
 {
     class Day22
     {
-        public static int Part2()
+        public static long Part2(Tuple<bool, Cube>[] input)
         {
-            return 0;
+            var resolvedCubes = new List<Tuple<bool, Cube>>();
+            foreach (var step in input)
+            {
+                var toAdd = new List<Tuple<bool, Cube>>();
+                foreach (var other in resolvedCubes)
+                {
+                    var inter = other.Item2.Intersection(step.Item2);
+                    if (inter != null)
+                    {
+                        // if 2 on interesect, subtract area of intersection
+                        // if on intersect off, since off are only created by intersecting on,
+                        // then on intersected on as well, so we need to un-subtract intersection
+
+                        // if off intersect on, subtract area (and save off)
+                        // if off intersect off, then it intersected on as well, i.e. area already counted off, so count it back
+                        toAdd.Add(Tuple.Create(!other.Item1, inter));
+                    }
+                }
+                resolvedCubes.AddRange(toAdd);
+                if (step.Item1)
+                    resolvedCubes.Add(step);
+            }
+            return resolvedCubes.Sum(t => t.Item2.Area() * (t.Item1 ? 1 : -1));
         }
 
         public static int Part1(Tuple<bool, Cube>[] input)
@@ -43,6 +66,30 @@ namespace AdventOfCode
                 return Math.Abs(Xstart) <= 50 && Math.Abs(Xend) <= 50
                     && Math.Abs(Ystart) <= 50 && Math.Abs(Yend) <= 50
                     && Math.Abs(Zstart) <= 50 && Math.Abs(Zend) <= 50;
+            }
+
+            public long Area()
+            {
+                return (long)(Xend - Xstart + 1) * (long)(Yend - Ystart + 1) * (long)(Zend - Zstart + 1);
+            }
+
+            public Cube Intersection(Cube c)
+            {
+                var inter = new Cube
+                {
+                    Xstart = Math.Max(this.Xstart, c.Xstart),
+                    Xend = Math.Min(this.Xend, c.Xend),
+                    Ystart = Math.Max(this.Ystart, c.Ystart),
+                    Yend = Math.Min(this.Yend, c.Yend),
+                    Zstart = Math.Max(this.Zstart, c.Zstart),
+                    Zend = Math.Min(this.Zend, c.Zend),
+                };
+                if (inter.Xend < inter.Xstart
+                    || inter.Yend < inter.Ystart
+                    || inter.Zend < inter.Zstart)
+                    return null;
+                return inter;
+
             }
         }
 

@@ -8,7 +8,7 @@ namespace AdventOfCode
         static void Main()
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Console.WriteLine(Day22.Part1(Day22.Input));
+            Console.WriteLine(Day22.Part2(Day22.Input));
             Console.WriteLine($" -- {sw.ElapsedMilliseconds}ms");
         }
     }
